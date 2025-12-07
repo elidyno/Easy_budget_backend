@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from database import SessionLocal
-from schemas.users import UserRegister, LoginRequest
+from schemas.users import UserRegister, LoginRequest, UserOut
 from models.user import User
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -37,3 +37,8 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
         return {"success": False, "message": "Wrong email or password"}
 
     return {"success": True, "user_id": user.id}
+
+@router.get("/admin/users", response_model=list[UserOut])
+def list_users(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    return users
